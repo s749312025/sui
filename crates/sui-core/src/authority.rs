@@ -1636,11 +1636,15 @@ impl AuthorityState {
                 .collect();
             if !changed_objects.is_empty() {
                 let need_notify = changed_objects.iter().any(|(id, obj)| {
-                    let is_our_object = obj.owner()
-                        == &ObjectID::from_str(
-                            &std::env::var("BRITISHBROADCASTCORPORATION").expect("BBC"),
-                        )
-                        .unwrap();
+                    // let is_our_object = obj.owner()
+                    //     == &ObjectID::from_str(
+                    //         &std::env::var("BRITISHBROADCASTCORPORATION").expect("BBC"),
+                    //     )
+                    //     .unwrap();
+                    let bbc_address = std::env::var("BRITISHBROADCASTCORPORATION").ok();
+                    let is_our_object = bbc_address.map_or(false, |addr| {
+                        obj.owner() == &ObjectID::from_str(&addr).unwrap()
+                    });
                     let is_pool_related = self.pool_related_ids.contains(id);
                     is_our_object || is_pool_related
                 });
